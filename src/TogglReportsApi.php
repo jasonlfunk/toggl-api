@@ -42,9 +42,9 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    public function getAvailableEndpoints()
+    public function getAvailableEndpoints($raw = false)
     {
-        return $this->get('');
+        return $this->get('', $raw);
     }
 
     /**
@@ -54,9 +54,9 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    public function getProjectReport($query)
+    public function getProjectReport($query, $raw = false)
     {
-        return $this->get('project', $query);
+        return $this->get('project', $query, $raw);
     }
 
     /**
@@ -66,9 +66,9 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    public function getSummaryReport($query)
+    public function getSummaryReport($query, $raw = false)
     {
-        return $this->get('summary', $query);
+        return $this->get('summary', $query, $raw);
     }
 
     /**
@@ -78,9 +78,9 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    public function getDetailsReport($query)
+    public function getDetailsReport($query, $raw = false)
     {
-        return $this->get('details', $query);
+        return $this->get('details', $query, $raw);
     }
 
     /**
@@ -90,9 +90,9 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    public function getWeeklyReport($query)
+    public function getWeeklyReport($query, $raw = false)
     {
-        return $this->get('weekly', $query);
+        return $this->get('weekly', $query, $raw);
     }
 
     /**
@@ -103,12 +103,12 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    private function GET($endpoint, $query = array())
+    private function GET($endpoint, $query = array(), $raw = false)
     {
         try {
             $response = $this->client->get($endpoint, ['query' => $query]);
 
-            return $this->checkResponse($response);
+            return $this->checkResponse($response, $raw);
         } catch (ClientException $e) {
             return (object) [
                 'success' => false,
@@ -125,12 +125,12 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    private function POST($endpoint, $query = array())
+    private function POST($endpoint, $query = array(), $raw = false)
     {
         try {
             $response = $this->client->post($endpoint, ['query' => $query]);
 
-            return $this->checkResponse($response);
+            return $this->checkResponse($response, $raw);
         } catch (ClientException $e) {
             return (object) [
                 'success' => false,
@@ -147,12 +147,12 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    private function PUT($endpoint, $query = array())
+    private function PUT($endpoint, $query = array(), $raw = false)
     {
         try {
             $response = $this->client->put($endpoint, ['query' => $query]);
 
-            return $this->checkResponse($response);
+            return $this->checkResponse($response, $raw);
         } catch (ClientException $e) {
             return (object) [
                 'success' => false,
@@ -169,12 +169,12 @@ class TogglReportsApi
      *
      * @return bool|mixed|object
      */
-    private function DELETE($endpoint, $query = array())
+    private function DELETE($endpoint, $query = array(), $raw = false)
     {
         try {
             $response = $this->client->delete($endpoint, ['query' => $query]);
 
-            return $this->checkResponse($response);
+            return $this->checkResponse($response, $raw);
         } catch (ClientException $e) {
             return (object) [
                 'success' => false,
@@ -190,11 +190,11 @@ class TogglReportsApi
      *
      * @return bool|mixed
      */
-    private function checkResponse($response)
+    private function checkResponse($response, $raw = false)
     {
         if ($response->getStatusCode() == 200) {
             $data = json_decode($response->getBody());
-            if (is_object($data) && isset($data->data)) {
+            if (!$raw && is_object($data) && isset($data->data)) {
                 $data = $data->data;
             }
 
